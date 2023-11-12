@@ -75,13 +75,17 @@ if( ! class_exists( 'AcrossWP_BuddyPress_BuddyBoss_Platform_Dependency' ) ) {
          * Load this function on plugin load hook
          */
         function constant_name(){
-            return 'BP_VERSION';
+            return array( 'BP_VERSION', 'BP_PLATFORM_VERSION' );
         }
 
         /**
          * Load this function on plugin load hook
          */
-        function mini_version(){
+        function mini_version() {
+            if ( defined( BP_PLATFORM_VERSION ) ) {
+                return '2.3.0';
+            }
+
             return '11.3.1';
         }
 
@@ -89,30 +93,25 @@ if( ! class_exists( 'AcrossWP_BuddyPress_BuddyBoss_Platform_Dependency' ) ) {
          * Load this function on plugin load hook
          */
         public function component_required() {
-            return array( 'media', 'activity' );
+            return array();
         }
 
         /**
-         * Check if the Required Component is Active
+         * Load this function on plugin load hook
+         * This was done to support BuddyPress and BuddyBoss Platform
          */
-        public function required_component_is_active() {
-            $is_active = false;
-            $component_required = $this->component_required();
+        public function constant_define(){
 
-            // Active components.
-            $active_components = apply_filters( 'bp_active_components', bp_get_option( 'bp-active-components' ) );
-
-            foreach( $component_required as $component_require ) {
-                if( isset( $active_components[ $component_require ] ) ) {
-                    $is_active = true;
-                } else {
-                    $is_active = false;
-                    break;
+            $return = false;
+            $constants = $this->constant_name();
+            foreach( $constants as $constant ) {
+                $constant = (string) $constant;
+                if ( defined( $constant ) ) {
+                    $return = true;
                 }
             }
 
-            return $is_active;
-
+            return $return;
         }
     }
 }
